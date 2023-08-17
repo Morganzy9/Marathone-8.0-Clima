@@ -6,8 +6,9 @@
 //
 
 import UIKit
+import CoreLocation
 
-class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManagerDelegate {
+class WeatherViewController: UIViewController {
 
     @IBOutlet var conditionImageView: UIImageView!
     @IBOutlet var temperatureLabel: UILabel!
@@ -17,14 +18,27 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManag
     
     var weatherManager = WeatherManager()
     
+    var locationManager = CLLocationManager()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.requestLocation()
         
         weatherManager.delegate = self
         searchTextField.delegate = self
         
+        
     }
+        
+}
 
+//  MARK: - Extensions
+
+extension WeatherViewController: UITextFieldDelegate {
+    
     @IBAction func searchButtonPressed(_ sender: UIButton) {
         view.endEditing(true)
         
@@ -62,6 +76,9 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManag
         textField.text = ""
     }
     
+}
+
+extension WeatherViewController: WeatherManagerDelegate {
     
     func didUpdateWeather(_ weathermanager: WeatherManager,_ weather: WeatherModel) {
         
@@ -87,6 +104,27 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManag
         }
         
         alert.addAction(okButton)
+    }
+    
+}
+
+//  MARK: - CLLocationManagerDelegate
+
+extension WeatherViewController: CLLocationManagerDelegate {
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        
+        guard  let location = locations.last else { return }
+        
+        let lat = location.coordinate.latitude
+        let lon = location.coordinate.longitude
+        
+        weatherManager.fetchWeather(latitude: lat, longitude: lon)
+        
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error)
     }
     
 }
