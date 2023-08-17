@@ -33,6 +33,11 @@ class WeatherViewController: UIViewController {
         
     }
         
+    
+    @IBAction func locationPressed(_ sender: UIButton) {
+        locationManager.requestLocation()
+    }
+    
 }
 
 //  MARK: - Extensions
@@ -115,6 +120,8 @@ extension WeatherViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
         guard  let location = locations.last else { return }
+        
+        locationManager.stopUpdatingLocation()
         
         let lat = location.coordinate.latitude
         let lon = location.coordinate.longitude
