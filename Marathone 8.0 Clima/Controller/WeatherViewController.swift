@@ -7,7 +7,7 @@
 
 import UIKit
 
-class WeatherViewController: UIViewController, UITextFieldDelegate {
+class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManagerDelegate {
 
     @IBOutlet var conditionImageView: UIImageView!
     @IBOutlet var temperatureLabel: UILabel!
@@ -15,11 +15,12 @@ class WeatherViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet var searchTextField: UITextField!
     
     
-    let weatherManager = WeatherManager()
+    var weatherManager = WeatherManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        weatherManager.delegate = self
         searchTextField.delegate = self
         
     }
@@ -59,6 +60,33 @@ class WeatherViewController: UIViewController, UITextFieldDelegate {
         weatherManager.fetchWeather(cityName)
         
         textField.text = ""
+    }
+    
+    
+    func didUpdateWeather(_ weathermanager: WeatherManager,_ weather: WeatherModel) {
+        
+        DispatchQueue.main.async {
+            
+            self.temperatureLabel.text = weather.temperatureString
+            
+            self.conditionImageView.image = UIImage(systemName: weather.conditionName)
+            
+            self.cityLabel.text = weather.cityName
+            
+        }
+        
+        
+    }
+    
+    func didFailWithError(_ error: Error) {
+        
+        let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
+        
+        let okButton = UIAlertAction(title: "Ok", style: .destructive) { action in
+            print("Getting Error: \(error.localizedDescription)")
+        }
+        
+        alert.addAction(okButton)
     }
     
 }
