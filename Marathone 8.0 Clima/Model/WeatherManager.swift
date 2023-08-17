@@ -46,7 +46,7 @@ struct WeatherManager {
     }
     
     
-    func parseJson(with data: Data) {
+    func parseJson(with data: Data)-> WeatherModel? {
         
         let decoder = JSONDecoder()
         
@@ -60,6 +60,7 @@ struct WeatherManager {
             
             let weather = WeatherModel(conditionId: id, cityName: name, temperature: temp)
             
+            return weather
             
         } catch {
             print("Error")
